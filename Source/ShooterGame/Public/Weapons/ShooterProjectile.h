@@ -26,23 +26,17 @@ protected:
 	class UParticleSystemComponent* ParticleComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile")
-	class UProjectileMovementComponent* ProjectileMovementComp;	
+	class UProjectileMovementComponent* ProjectileMovementComp;
 
-	UFUNCTION()
-	void OnProjectileHit(class UPrimitiveComponent* HitComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	UFUNCTION(BlueprintCallable, Category = "Projectile")
+	void PlayImpactEffects(const FRotator ImpactRotation);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Projectile")
-	void OnSuccessfulHit(class UPrimitiveComponent* HitComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")
+	float Damage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")
 	class UParticleSystem* ImpactEffect;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")
 	class USoundCue* ImpactSound;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")
-	TSubclassOf<class UDamageType> DamageType;
-
-	float Damage;
-	uint8 bSuccessfulHit : 1;
 };

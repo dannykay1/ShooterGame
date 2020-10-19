@@ -25,6 +25,13 @@ public:
 	// Gets the camera as the pawn view location.
 	virtual FVector GetPawnViewLocation() const override;
 
+	virtual void PossessedBy(class AController* NewController) override;
+	virtual void UnPossessed() override;
+	virtual void DetachFromControllerPendingDestroy() override;
+
+	UFUNCTION(BlueprintCallable, Category = "Shooter Character")
+	void Kill();
+
 	FORCEINLINE uint8 GetIsSprinting() const { return bIsSprinting; }
 
 	// Gets the animation movement type.  Used in animation blueprint.
@@ -42,17 +49,20 @@ protected:
 
 	void ToggleCrouch();
 
-	void StartFire();
-	void StopFire();
+	UFUNCTION()
+	void OnHealthChanged(class UShooterHealthComponent* OwningHealthComp, float Health, float HealthDelta, const UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
-	void Interact();
+	UFUNCTION(BlueprintCallable, Category = "Shooter Character")
+	void StartFire();
+	UFUNCTION(BlueprintCallable, Category = "Shooter Character")
+	void StopFire();
 
 	uint8 bIsSprinting : 1;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
 	float SprintSpeed;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
 	float WalkSpeed;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -60,6 +70,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UCameraComponent* CameraComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UShooterHealthComponent* HealthComp;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	TSubclassOf<class AShooterWeapon> StartingWeaponClass;

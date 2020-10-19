@@ -9,7 +9,7 @@
 #include "Weapons/ShooterProjectile.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/Actor.h"
-#include "GameFramework/Character.h"
+#include "Player/ShooterCharacter.h"
 
 
 // Sets default values
@@ -32,6 +32,15 @@ AShooterWeapon::AShooterWeapon()
 
 	bAutomaticFire = false;
 }
+
+
+void AShooterWeapon::SetOwner(class AActor* NewOwner)
+{
+	Super::SetOwner(NewOwner);
+
+	OwnerCharacter = Cast<AShooterCharacter>(NewOwner);
+}
+
 
 // Called when the game starts or when spawned
 void AShooterWeapon::BeginPlay()
@@ -58,8 +67,7 @@ void AShooterWeapon::StopFire()
 
 void AShooterWeapon::Fire()
 {
-	AActor* MyOwner = GetOwner();
-	if (MyOwner == nullptr)
+	if (OwnerCharacter == nullptr || OwnerCharacter->GetController() == nullptr)
 	{
 		return;
 	}
@@ -69,7 +77,7 @@ void AShooterWeapon::Fire()
 		FVector EyeLocation;
 		FRotator EyeRotation;
 
-		MyOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
+		OwnerCharacter->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
 		FVector ShotDirection = EyeRotation.Vector();
 
@@ -81,7 +89,7 @@ void AShooterWeapon::Fire()
 
 		// Collision query params.
 		FCollisionQueryParams QueryParams;
-		QueryParams.AddIgnoredActor(MyOwner);
+		QueryParams.AddIgnoredActor(OwnerCharacter);
 		QueryParams.AddIgnoredActor(this);
 		QueryParams.bTraceComplex = true;
 
@@ -114,16 +122,14 @@ void AShooterWeapon::PlayFireEffects()
 		UGameplayStatics::SpawnSoundAttached(MuzzleSound, MeshComp, MuzzleSocketName);
 	}
 
-	ACharacter* MyCharacter = Cast<ACharacter>(GetOwner());
-	if (MyCharacter)
+	if (OwnerCharacter)
 	{
-		MyCharacter->PlayAnimMontage(FireMontage);
+		OwnerCharacter->PlayAnimMontage(FireMontage);
 	}
 
-	APawn* MyOwner = Cast<APawn>(GetOwner());
-	if (MyOwner)
+	if (OwnerCharacter)
 	{
-		APlayerController* PC = Cast<APlayerController>(MyOwner->GetController());
+		APlayerController* PC = Cast<APlayerController>(OwnerCharacter->GetController());
 		if (PC)
 		{
 			PC->ClientPlayCameraShake(FireCamShake);
@@ -134,8 +140,7 @@ void AShooterWeapon::PlayFireEffects()
 
 void AShooterWeapon::SpawnProjectile(FVector EndPoint)
 {
-	APawn* MyOwner = Cast<APawn>(GetOwner());
-	if (ProjectileClassToSpawn && MyOwner)
+	if (ProjectileClassToSpawn && OwnerCharacter)
 	{
 		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
 		FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, EndPoint);
@@ -145,8 +150,8 @@ void AShooterWeapon::SpawnProjectile(FVector EndPoint)
 		SpawnTransform.SetRotation(LookRotation.Quaternion());
 
 		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = MyOwner;
-		SpawnParams.Instigator = MyOwner;
+		SpawnParams.Owner = OwnerCharacter;
+		SpawnParams.Instigator = OwnerCharacter;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		GetWorld()->SpawnActor<AShooterProjectile>(ProjectileClassToSpawn, SpawnTransform, SpawnParams);

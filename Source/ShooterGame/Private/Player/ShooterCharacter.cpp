@@ -8,6 +8,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Weapons/ShooterWeapon.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "AIController.h"
+#include "Components/ShooterHealthComponent.h"
 
 
 // Sets default values
@@ -26,6 +28,8 @@ AShooterCharacter::AShooterCharacter()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);
+
+	HealthComp = CreateDefaultSubobject<UShooterHealthComponent>(TEXT("HealthComp"));
 
 	bUseControllerRotationYaw = true;
 
@@ -52,6 +56,8 @@ void AShooterCharacter::BeginPlay()
 			EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, EquippedWeapon->GetWeaponAttachSocketName());
 		}
 	}
+
+	HealthComp->OnHealthChanged.AddDynamic(this, &AShooterCharacter::OnHealthChanged);
 }
 
 
@@ -82,8 +88,6 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AShooterCharacter::StartFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AShooterCharacter::StopFire);
-
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AShooterCharacter::Interact);
 }
 
 
@@ -100,6 +104,55 @@ FVector AShooterCharacter::GetPawnViewLocation() const
 	}
 
 	return Super::GetPawnViewLocation();
+}
+
+
+void AShooterCharacter::PossessedBy(class AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->SetOwner(this);
+	}
+}
+
+
+void AShooterCharacter::UnPossessed()
+{
+	Super::UnPossessed();
+
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->StopFire();
+	}
+}
+
+
+void AShooterCharacter::DetachFromControllerPendingDestroy()
+{
+	Super::DetachFromControllerPendingDestroy();
+	Kill();
+}
+
+
+void AShooterCharacter::Kill()
+{
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->Destroy();
+	}
+
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+	GetCharacterMovement()->GravityScale = 0.f;
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+	GetMesh()->SetSimulatePhysics(true);
+
+	SetLifeSpan(10.f);
 }
 
 
@@ -161,6 +214,15 @@ void AShooterCharacter::ToggleCrouch()
 }
 
 
+void AShooterCharacter::OnHealthChanged(class UShooterHealthComponent* OwningHealthComp, float Health, float HealthDelta, const UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
+{
+	if (Health <= 0.0f)
+	{	
+		DetachFromControllerPendingDestroy();
+	}
+}
+
+
 void AShooterCharacter::StartFire()
 {
 	if (EquippedWeapon)
@@ -177,37 +239,4 @@ void AShooterCharacter::StopFire()
 	{
 		EquippedWeapon->StopFire();
 	}
-}
-
-
-void AShooterCharacter::Interact()
-{
-	FVector EyeLocation;
-	FRotator EyeRotation;
-
-	GetActorEyesViewPoint(EyeLocation, EyeRotation);
-
-	FVector ShotDirection = EyeRotation.Vector();
-
-	FVector TraceEnd = EyeLocation + (ShotDirection * 10000.f);
-
-	// Collision query params.
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(EquippedWeapon);
-	QueryParams.AddIgnoredActor(this);
-	QueryParams.bTraceComplex = true;
-
-	// Hit.
-	FHitResult Hit;
-	/*if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, COLLISION_WEAPON, QueryParams))
-	{
-		if (Hit.GetActor()->IsValidLowLevel())
-		{
-			AShooterCharacter* HitCharacter = Cast<AShooterCharacter>(Hit.GetActor());
-			if (HitCharacter)
-			{
-				GetController()->Possess(HitCharacter);
-			}
-		}
-	}*/
 }

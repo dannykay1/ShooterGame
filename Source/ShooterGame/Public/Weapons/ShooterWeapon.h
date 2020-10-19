@@ -16,6 +16,8 @@ public:
 	// Sets default values for this actor's properties
 	AShooterWeapon();
 
+	virtual void SetOwner(class AActor* NewOwner);
+
 	FORCEINLINE EWeaponAnimationMovementType GetAnimationMovementType() const { return AnimationType; }
 	FORCEINLINE FName GetWeaponAttachSocketName() const { return WeaponAttachSocketName; }
 
@@ -29,6 +31,9 @@ protected:
 	void Fire();
 	void PlayFireEffects();
 	void SpawnProjectile(FVector EndPoint);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
+	class AShooterCharacter* OwnerCharacter;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	class USkeletalMeshComponent* MeshComp;

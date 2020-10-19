@@ -29,7 +29,6 @@ AShooterProjectile::AShooterProjectile()
 	ProjectileMovementComp->ProjectileGravityScale = 0.f;
 
 	Damage = 20.0f;
-	bSuccessfulHit = false;
 }
 
 
@@ -38,40 +37,24 @@ void AShooterProjectile::BeginPlay()
 {
 	Super::BeginPlay();	
 
-	SetLifeSpan(30.0f);
+	SetLifeSpan(20.0f);
 
 	if (SphereComp)
 	{
 		SphereComp->IgnoreActorWhenMoving(GetOwner(), true);
-		SphereComp->OnComponentHit.AddDynamic(this, &AShooterProjectile::OnProjectileHit);
 	}
 }
 
 
-void AShooterProjectile::OnProjectileHit(class UPrimitiveComponent* HitComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AShooterProjectile::PlayImpactEffects(const FRotator ImpactRotation)
 {
-	if (!OtherActor || bSuccessfulHit)
-	{
-		return;
-	}
-
-	bSuccessfulHit = true;
-
 	if (ImpactEffect)
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, GetActorLocation(), Hit.ImpactNormal.Rotation());
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, GetActorLocation(), ImpactRotation);
 	}
 
 	if (ImpactSound)
 	{
 		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), ImpactSound, GetActorLocation());
 	}
-
-	OnSuccessfulHit(HitComponent, OtherActor,OtherComp, NormalImpulse, Hit);
-
-	UGameplayStatics::ApplyPointDamage(OtherActor, Damage, Hit.TraceStart, Hit, GetOwner()->GetInstigatorController(), GetOwner(), DamageType);
-
-	ParticleComp->Deactivate();
-
-	SetLifeSpan(1.0f);
 }

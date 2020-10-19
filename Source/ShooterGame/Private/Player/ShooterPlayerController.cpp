@@ -3,6 +3,7 @@
 #include "Player/ShooterPlayerController.h"
 #include "GameFramework/Pawn.h"
 #include "ShooterGame/ShooterGame.h"
+#include "Components/ShooterHealthComponent.h"
 
 
 void AShooterPlayerController::SetupInputComponent()
@@ -42,13 +43,30 @@ void AShooterPlayerController::PossessNewPawn()
 	FHitResult Hit;
 	if (GetWorld()->SweepSingleByChannel(Hit, EyeLocation, TraceEnd, FQuat::Identity, COLLISION_WEAPON, CollisionSphere))
 	{
-		if (Hit.GetActor()->IsValidLowLevel())
+		if (Hit.GetActor())
 		{
 			APawn* HitPawn = Cast<APawn>(Hit.GetActor());
+
 			if (HitPawn)
 			{
-				MyPawn->UnPossessed();
-				Possess(HitPawn);
+				UShooterHealthComponent* HealthComp = Cast<UShooterHealthComponent>(HitPawn->GetComponentByClass(UShooterHealthComponent::StaticClass()));
+
+				// Only allow possession of pawn if it has health component and has health (not dead).
+				if (HealthComp && HealthComp->GetHealth() > 0.0f)
+				{
+					// Detach and kill current pawn.
+					MyPawn->DetachFromControllerPendingDestroy();
+
+					// Prepare hit pawn by unpossessing from ai controller to be possessed by this controller.
+					HitPawn->UnPossessed();
+
+					SetViewTargetWithBlend(HitPawn, 0.5f);
+					FTimerDelegate TimerDel_Posses;
+					FTimerHandle TimerHandle_Posses;
+
+					TimerDel_Posses.BindUFunction(this, FName("Possess"), HitPawn);
+					GetWorldTimerManager().SetTimer(TimerHandle_Posses, TimerDel_Posses, 0.6f, false);
+				}
 			}
 		}
 	}
