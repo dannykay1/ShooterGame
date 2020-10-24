@@ -34,8 +34,6 @@ AShooterCharacter::AShooterCharacter()
 	bUseControllerRotationYaw = true;
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
-
-	BodyColor = FLinearColor(1.f, 1.f, 1.f);
 }
 
 
@@ -61,10 +59,7 @@ void AShooterCharacter::BeginPlay()
 
 	HealthComp->OnHealthChanged.AddDynamic(this, &AShooterCharacter::OnHealthChanged);
 
-	UMaterialInstanceDynamic* DynamicMaterial = GetMesh()->CreateAndSetMaterialInstanceDynamic(0);
-	DynamicMaterial->SetVectorParameterValue("BodyColor", BodyColor);
-
-	DynamicMaterial = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
+	DynamicMaterial = GetMesh()->CreateAndSetMaterialInstanceDynamic(0);
 	DynamicMaterial->SetVectorParameterValue("BodyColor", BodyColor);
 }
 
@@ -92,7 +87,7 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AShooterCharacter::ToggleCrouch);
 
-	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &AShooterCharacter::StartSprint);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &AShooterCharacter::StartSprint);
 
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AShooterCharacter::StartFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AShooterCharacter::StopFire);
@@ -248,16 +243,3 @@ void AShooterCharacter::StopFire()
 		EquippedWeapon->StopFire();
 	}
 }
-
-#if WITH_EDITOR
-void AShooterCharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-
-	UMaterialInstanceDynamic* DynamicMaterial = GetMesh()->CreateAndSetMaterialInstanceDynamic(0);
-	DynamicMaterial->SetVectorParameterValue("BodyColor", BodyColor);
-
-	DynamicMaterial = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
-	DynamicMaterial->SetVectorParameterValue("BodyColor", BodyColor);
-}
-#endif

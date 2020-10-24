@@ -37,10 +37,6 @@ public:
 	// Gets the animation movement type.  Used in animation blueprint.
 	EWeaponAnimationMovementType GetWeaponAnimationMovementType() const;
 
-	#if WITH_EDITOR
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-	#endif
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -84,6 +80,8 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	class AShooterWeapon* EquippedWeapon;
+
+	class UMaterialInstanceDynamic* DynamicMaterial;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	FLinearColor BodyColor;
