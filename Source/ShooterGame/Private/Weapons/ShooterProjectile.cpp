@@ -24,8 +24,8 @@ AShooterProjectile::AShooterProjectile()
 	ParticleComp->SetupAttachment(SphereComp);
 	
 	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComp"));
-	ProjectileMovementComp->InitialSpeed = 1500.f;
-	ProjectileMovementComp->MaxSpeed = 1500.f;
+	ProjectileMovementComp->InitialSpeed = 8000.f;
+	ProjectileMovementComp->MaxSpeed = 8000.f;
 	ProjectileMovementComp->ProjectileGravityScale = 0.f;
 
 	Damage = 20.0f;

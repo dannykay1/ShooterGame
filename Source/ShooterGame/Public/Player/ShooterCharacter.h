@@ -37,6 +37,12 @@ public:
 	// Gets the animation movement type.  Used in animation blueprint.
 	EWeaponAnimationMovementType GetWeaponAnimationMovementType() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Shooter Character")
+	void StartFire();
+
+	UFUNCTION(BlueprintCallable, Category = "Shooter Character")
+	void StopFire();
+
 	#if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	#endif
@@ -54,13 +60,7 @@ protected:
 	void ToggleCrouch();
 
 	UFUNCTION()
-	void OnHealthChanged(class UShooterHealthComponent* OwningHealthComp, float Health, float HealthDelta, const UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
-
-	UFUNCTION(BlueprintCallable, Category = "Shooter Character")
-	void StartFire();
-
-	UFUNCTION(BlueprintCallable, Category = "Shooter Character")
-	void StopFire();
+	void OnHealthChanged(class UShooterHealthComponent* OwningHealthComp, float Health, float HealthDelta, const UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);	
 
 	uint8 bIsSprinting : 1;
 

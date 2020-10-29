@@ -26,7 +26,9 @@ AShooterWeapon::AShooterWeapon()
 	MuzzleSocketName = "Socket_Muzzle";
 	AnimationType = EWeaponAnimationMovementType::Pistol;
 
-	NumBulletsPerShot = 1;
+	BurstCounter = 1;
+	BurstDelay = 0.f;
+
 	BulletSpread = 2.0f;
 	RateOfFire = 600;
 
@@ -55,7 +57,7 @@ void AShooterWeapon::BeginPlay()
 void AShooterWeapon::StartFire()
 {
 	float FirstDelay = FMath::Max(LastFireTime + TimeBetweenShots - GetWorld()->TimeSeconds, 0.0f);
-	GetWorldTimerManager().SetTimer(TimerHandle_TimeBetweenShots, this, &AShooterWeapon::Fire, TimeBetweenShots, bAutomaticFire, FirstDelay);
+	GetWorldTimerManager().SetTimer(TimerHandle_TimeBetweenShots, this, &AShooterWeapon::ProcessFire, TimeBetweenShots, bAutomaticFire, FirstDelay);
 }
 
 
@@ -65,52 +67,77 @@ void AShooterWeapon::StopFire()
 }
 
 
-void AShooterWeapon::Fire()
+void AShooterWeapon::ProcessFire()
 {
 	if (OwnerCharacter == nullptr || OwnerCharacter->GetController() == nullptr)
 	{
 		return;
 	}
 
-	for (int32 i = 0; i < NumBulletsPerShot; ++i)
+	if (BurstCounter > 1 && BurstDelay > 0.f)
 	{
-		FVector EyeLocation;
-		FRotator EyeRotation;
-
-		OwnerCharacter->GetActorEyesViewPoint(EyeLocation, EyeRotation);
-
-		FVector ShotDirection = EyeRotation.Vector();
-
-		// Spread.
-		float HalfRad = FMath::DegreesToRadians(BulletSpread);
-		ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
-
-		FVector TraceEnd = EyeLocation + (ShotDirection * 10000.f);
-
-		// Collision query params.
-		FCollisionQueryParams QueryParams;
-		QueryParams.AddIgnoredActor(OwnerCharacter);
-		QueryParams.AddIgnoredActor(this);
-		QueryParams.bTraceComplex = true;
-
-		FVector EndPoint = TraceEnd;
-
-		// Hit.
-		FHitResult Hit;
-		if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, COLLISION_WEAPON, QueryParams))
+		for (int32 i = 1; i <= BurstCounter; ++i)
 		{
-			EndPoint = Hit.ImpactPoint;
+			FTimerHandle TimerHande_Burst;
+			GetWorldTimerManager().SetTimer(TimerHande_Burst, this, &AShooterWeapon::HandleBurstFire, BurstDelay * i);
 		}
+	}
+	else
+	{
+		SimulateWeaponFire();
 
-		SpawnProjectile(EndPoint);
+		for (int32 i = 1; i <= BurstCounter; ++i)
+		{
+			FireWeapon();
+		}
 	}
 
-	PlayFireEffects();
 	LastFireTime = GetWorld()->TimeSeconds;
 }
 
 
-void AShooterWeapon::PlayFireEffects()
+void AShooterWeapon::HandleBurstFire()
+{
+	SimulateWeaponFire();
+	FireWeapon();
+}
+
+
+FHitResult AShooterWeapon::WeaponTrace()
+{
+	FVector EyeLocation;
+	FRotator EyeRotation;
+
+	OwnerCharacter->GetActorEyesViewPoint(EyeLocation, EyeRotation);
+
+	FVector ShotDirection = EyeRotation.Vector();
+
+	// Spread.
+	float HalfRad = FMath::DegreesToRadians(BulletSpread);
+	ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
+
+	FVector TraceEnd = EyeLocation + (ShotDirection * 10000.f);
+
+	// Collision query params.
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(OwnerCharacter);
+	QueryParams.AddIgnoredActor(this);
+	QueryParams.bReturnPhysicalMaterial = true;
+
+	FHitResult Hit(ForceInit);
+	GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, COLLISION_WEAPON, QueryParams);
+
+	return Hit;
+}
+
+
+FVector AShooterWeapon::GetMuzzleLocation() const
+{
+	return MeshComp->GetSocketLocation(WeaponAttachSocketName);
+}
+
+
+void AShooterWeapon::SimulateWeaponFire()
 {
 	if (MuzzleEffect)
 	{

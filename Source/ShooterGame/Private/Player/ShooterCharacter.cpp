@@ -25,6 +25,8 @@ AShooterCharacter::AShooterCharacter()
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(GetRootComponent());
 	SpringArmComp->bUsePawnControlRotation = true;
+	SpringArmComp->SocketOffset = FVector(0.f, 12.f, 125.f);
+	SpringArmComp->TargetArmLength = 300.f;
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);

@@ -7,7 +7,7 @@
 #include "ShooterGame/ShooterGame.h"
 #include "ShooterWeapon.generated.h"
 
-UCLASS()
+UCLASS(Abstract, Blueprintable)
 class SHOOTERGAME_API AShooterWeapon : public AActor
 {
 	GENERATED_BODY()
@@ -28,17 +28,23 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void Fire();
-	void PlayFireEffects();
+	void ProcessFire();
+	void HandleBurstFire();
+	virtual void FireWeapon() PURE_VIRTUAL(AShooterWeapon::FireWeapon,);
+
+	FVector GetMuzzleLocation() const;
+	void SimulateWeaponFire();
 	void SpawnProjectile(FVector EndPoint);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
+	struct FHitResult WeaponTrace();
+
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	class AShooterCharacter* OwnerCharacter;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	class USkeletalMeshComponent* MeshComp;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	FName WeaponAttachSocketName;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
@@ -63,7 +69,10 @@ protected:
 	TSubclassOf<class AShooterProjectile> ProjectileClassToSpawn;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-	int32 NumBulletsPerShot;
+	int32 BurstCounter;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	float BurstDelay;
 
 	FTimerHandle TimerHandle_TimeBetweenShots;
 
