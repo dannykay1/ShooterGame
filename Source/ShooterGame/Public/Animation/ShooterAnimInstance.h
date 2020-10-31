@@ -42,6 +42,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	uint8 bIsSprinting : 1;
 
+	/* Is character zooming weapon? */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	uint8 bIsTargeting : 1;
+
 	/* Is character falling?*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	uint8 bIsFalling : 1;

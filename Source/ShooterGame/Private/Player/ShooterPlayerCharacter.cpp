@@ -44,10 +44,10 @@ void AShooterPlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// Zoom
-	float TargetFOV = bIsTargeting ? 35.f : 90.f;
-	float NewFOV = FMath::FInterpTo(CameraComp->FieldOfView, TargetFOV, DeltaTime, 10.f);
+	float TargetArmLength = bIsTargeting ? 35.f : 250.f;
+	float NewArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, 10.f);
 
-	CameraComp->SetFieldOfView(NewFOV);
+	SpringArmComp->TargetArmLength = NewArmLength;
 
 	// Switch shoulder
 	FVector SpringArmLocation = SpringArmComp->GetRelativeLocation();

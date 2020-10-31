@@ -32,7 +32,8 @@ AShooterWeapon::AShooterWeapon()
 	BurstCounter = 1;
 	BurstDelay = 0.f;
 
-	BulletSpread = 2.0f;
+	BulletSpread = 2.f;
+	ZoomedBulletSpread = 1.f;
 	RateOfFire = 600;
 
 	bAutomaticFire = false;
@@ -116,7 +117,9 @@ FHitResult AShooterWeapon::WeaponTrace()
 	FVector ShotDirection = EyeRotation.Vector();
 
 	// Spread.
-	float HalfRad = FMath::DegreesToRadians(BulletSpread);
+	float TargetSpread = OwnerCharacter->GetIsTargeting() ? ZoomedBulletSpread : BulletSpread;
+
+	float HalfRad = FMath::DegreesToRadians(TargetSpread);
 	ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
 
 	FVector TraceEnd = EyeLocation + (ShotDirection * 10000.f);
@@ -149,12 +152,23 @@ void AShooterWeapon::SimulateWeaponFire()
 
 	if (MuzzleSound)
 	{
-		UGameplayStatics::SpawnSoundAttached(MuzzleSound, MeshComp, MuzzleSocketName);
+		if (OwnerCharacter && OwnerCharacter->IsPlayerControlled())
+		{
+			UGameplayStatics::PlaySound2D(OwnerCharacter, MuzzleSound, 0.5f);
+		}
+		else
+		{
+			UGameplayStatics::SpawnSoundAttached(MuzzleSound, MeshComp, MuzzleSocketName);
+		}
 	}
 
 	if (OwnerCharacter)
 	{
-		OwnerCharacter->PlayAnimMontage(FireMontage);
+		UAnimMontage* TargetMontage = OwnerCharacter->GetIsTargeting() ? FireMontageAiming : FireMontage;
+		if (TargetMontage)
+		{
+			OwnerCharacter->PlayAnimMontage(TargetMontage);
+		}
 	}
 
 	if (OwnerCharacter)

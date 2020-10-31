@@ -64,10 +64,13 @@ void AShooterCharacter::BeginPlay()
 
 void AShooterCharacter::Kill()
 {
-	if (GetCurrentWeapon())
+	for (AShooterWeapon* Weapon : EquippedWeapons)
 	{
-		GetCurrentWeapon()->StopFire();
-		GetCurrentWeapon()->Destroy();
+		if (Weapon)
+		{
+			Weapon->StopFire();
+			Weapon->Destroy();
+		}
 	}
 
 	DetachFromControllerPendingDestroy();

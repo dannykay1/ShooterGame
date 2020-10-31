@@ -61,6 +61,9 @@ protected:
 	class UAnimMontage* FireMontage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	class UAnimMontage* FireMontageAiming;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 	class UAnimMontage* ReloadMontage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
@@ -92,6 +95,10 @@ protected:
 	/* Bullet Spread in Degrees */
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))
 	float BulletSpread;
+
+	/* Zoomed Bullet Spread in Degrees */
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon", meta = (ClampMin = 0.0f))
+	float ZoomedBulletSpread;
 
 	// Derived from RateOfFire
 	float TimeBetweenShots;

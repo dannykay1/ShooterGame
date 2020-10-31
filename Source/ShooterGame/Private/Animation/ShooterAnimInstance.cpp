@@ -11,6 +11,7 @@ UShooterAnimInstance::UShooterAnimInstance()
 {
 	MovementType = EWeaponAnimationMovementType::Pistol;
 	bIsMoving = false;
+	bIsTargeting = false;
 	Speed = 0.0f;
 	Direction = 0.0f;
 }
@@ -48,6 +49,7 @@ void UShooterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	bIsMoving = Speed > 0.1f;
 	bIsSprinting = CharacterOwner->GetIsSprinting();
+	bIsTargeting = CharacterOwner->GetIsTargeting();
 
 	if (CharacterOwner->GetCharacterMovement())
 	{
