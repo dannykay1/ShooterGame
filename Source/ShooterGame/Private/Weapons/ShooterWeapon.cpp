@@ -10,6 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/Actor.h"
 #include "Pawns/ShooterCharacter.h"
+#include "Animation/AnimMontage.h"
 
 
 // Sets default values

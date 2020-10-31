@@ -9,6 +9,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Weapons/ShooterWeapon.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Animation/AnimMontage.h"
 
 
 AShooterPlayerCharacter::AShooterPlayerCharacter()
@@ -16,7 +17,7 @@ AShooterPlayerCharacter::AShooterPlayerCharacter()
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
 	SpringArmComp->SetupAttachment(GetRootComponent());
 	SpringArmComp->bUsePawnControlRotation = true;
-	SpringArmComp->SetRelativeLocation(FVector(0.f, 45.f, 85.f));
+	SpringArmComp->SetRelativeLocation(FVector(0.f, 0.f, 85.f));
 	SpringArmComp->TargetArmLength = 250.f;
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
@@ -25,6 +26,8 @@ AShooterPlayerCharacter::AShooterPlayerCharacter()
 	bUseControllerRotationYaw = true;
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+
+	bIsViewingRightShoulder = true;
 }
 
 
@@ -39,6 +42,22 @@ void AShooterPlayerCharacter::BeginPlay()
 void AShooterPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// Zoom
+	float TargetFOV = bIsTargeting ? 35.f : 90.f;
+	float NewFOV = FMath::FInterpTo(CameraComp->FieldOfView, TargetFOV, DeltaTime, 10.f);
+
+	CameraComp->SetFieldOfView(NewFOV);
+
+	// Switch shoulder
+	FVector SpringArmLocation = SpringArmComp->GetRelativeLocation();
+
+	FVector TargetSpringArmLocation = FVector(SpringArmLocation);
+	TargetSpringArmLocation.Y = bIsViewingRightShoulder ? 45.f : -25.f;
+
+	FVector NewSpringArmLocation = FMath::VInterpTo(SpringArmLocation, TargetSpringArmLocation, DeltaTime, 30.f);
+	SpringArmComp->SetRelativeLocation(NewSpringArmLocation);
+
 }
 
 
@@ -66,6 +85,7 @@ void AShooterPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AShooterPlayerCharacter::Reload);
 
 	PlayerInputComponent->BindAction("Zoom", IE_Pressed, this, &AShooterPlayerCharacter::Zoom);
+	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &AShooterPlayerCharacter::Zoom);
 
 	PlayerInputComponent->BindAction("ToggleShoulder", IE_Pressed, this, &AShooterPlayerCharacter::ToggleShoulder);
 
@@ -122,8 +142,24 @@ void AShooterPlayerCharacter::ToggleCrouch()
 }
 
 
+void AShooterPlayerCharacter::Zoom()
+{
+	StopSprint();
+
+	bIsTargeting = !bIsTargeting;
+}
+
+
+void AShooterPlayerCharacter::ToggleShoulder()
+{
+	bIsViewingRightShoulder = !bIsViewingRightShoulder;
+}
+
+
 void AShooterPlayerCharacter::NextWeapon()
 {
+	PlayAnimMontage(EquipMontage);
+
 	if (EquippedWeapons.IsValidIndex(CurrentWeaponIndex))
 	{
 		EquippedWeapons[CurrentWeaponIndex]->UnequipWeapon();
@@ -143,6 +179,8 @@ void AShooterPlayerCharacter::NextWeapon()
 
 void AShooterPlayerCharacter::PreviousWeapon()
 {
+	PlayAnimMontage(EquipMontage);
+
 	if (EquippedWeapons.IsValidIndex(CurrentWeaponIndex))
 	{
 		EquippedWeapons[CurrentWeaponIndex]->UnequipWeapon();

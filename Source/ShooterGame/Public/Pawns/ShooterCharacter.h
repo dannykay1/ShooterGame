@@ -20,6 +20,7 @@ public:
 	void Kill();
 
 	FORCEINLINE uint8 GetIsSprinting() const { return bIsSprinting; }
+	FORCEINLINE uint8 GetIsTargeting() const { return bIsTargeting; }
 	
 	class AShooterWeapon* GetCurrentWeapon() const;
 
@@ -55,6 +56,9 @@ protected:
 
 	int32 CurrentWeaponIndex;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	class UAnimMontage* EquipMontage;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
 	float SprintSpeed;
 
@@ -62,4 +66,5 @@ protected:
 	float WalkSpeed;
 
 	uint8 bIsSprinting : 1;
+	uint8 bIsTargeting : 1;
 };

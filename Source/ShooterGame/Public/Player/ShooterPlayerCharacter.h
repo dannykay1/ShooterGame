@@ -36,9 +36,7 @@ protected:
 
 	void ToggleCrouch();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Shooter Character")
 	void Zoom();
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Shooter Character")
 	void ToggleShoulder();
 
 	void NextWeapon();
@@ -49,4 +47,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UCameraComponent* CameraComp;
+
+	uint8 bIsViewingRightShoulder : 1;
 };

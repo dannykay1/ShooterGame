@@ -18,6 +18,8 @@ AShooterCharacter::AShooterCharacter()
 	HealthComp = CreateDefaultSubobject<UShooterHealthComponent>(TEXT("HealthComp"));
 
 	bIsSprinting = false;
+	bIsTargeting = false;
+
 	SprintSpeed = 1200.f;
 	WalkSpeed = 600.f;
 
