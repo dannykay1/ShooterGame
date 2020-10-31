@@ -2,7 +2,6 @@
 
 #include "Framework/ShooterGameModeBase.h"
 #include "Framework/ShooterGameStateBase.h"
-#include "Player/ShooterPlayerController.h"
 #include "Player/ShooterPlayerState.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -13,6 +12,5 @@ AShooterGameModeBase::AShooterGameModeBase()
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 
 	GameStateClass = AShooterGameStateBase::StaticClass();
-	PlayerControllerClass = AShooterPlayerController::StaticClass();
 	PlayerStateClass = AShooterPlayerState::StaticClass();
 }

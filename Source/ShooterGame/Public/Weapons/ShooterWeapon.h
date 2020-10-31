@@ -24,6 +24,9 @@ public:
 	void StartFire();
 	void StopFire();
 
+	void EquipWeapon();
+	void UnequipWeapon();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -34,18 +37,19 @@ protected:
 
 	FVector GetMuzzleLocation() const;
 	void SimulateWeaponFire();
-	void SpawnProjectile(FVector EndPoint);
 
 	struct FHitResult WeaponTrace();
 
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	class AShooterCharacter* OwnerCharacter;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	class USkeletalMeshComponent* MeshComp;
 
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	FName WeaponAttachSocketName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	FName HolsterAttachSocketName;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
 	FName MuzzleSocketName;

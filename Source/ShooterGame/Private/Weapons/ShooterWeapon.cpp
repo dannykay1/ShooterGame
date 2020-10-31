@@ -9,7 +9,7 @@
 #include "Weapons/ShooterProjectile.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/Actor.h"
-#include "Player/ShooterCharacter.h"
+#include "Pawns/ShooterCharacter.h"
 
 
 // Sets default values
@@ -23,7 +23,9 @@ AShooterWeapon::AShooterWeapon()
 	SetRootComponent(MeshComp);
 
 	WeaponAttachSocketName = "Socket_MainWeapon";
+	HolsterAttachSocketName = "Socket_HolsterMainWeapon";
 	MuzzleSocketName = "Socket_Muzzle";
+
 	AnimationType = EWeaponAnimationMovementType::Pistol;
 
 	BurstCounter = 1;
@@ -133,7 +135,7 @@ FHitResult AShooterWeapon::WeaponTrace()
 
 FVector AShooterWeapon::GetMuzzleLocation() const
 {
-	return MeshComp->GetSocketLocation(WeaponAttachSocketName);
+	return MeshComp->GetSocketLocation(MuzzleSocketName);
 }
 
 
@@ -165,22 +167,19 @@ void AShooterWeapon::SimulateWeaponFire()
 }
 
 
-void AShooterWeapon::SpawnProjectile(FVector EndPoint)
+void AShooterWeapon::EquipWeapon()
 {
-	if (ProjectileClassToSpawn && OwnerCharacter)
+	if (OwnerCharacter)
 	{
-		FVector MuzzleLocation = MeshComp->GetSocketLocation(MuzzleSocketName);
-		FRotator LookRotation = UKismetMathLibrary::FindLookAtRotation(MuzzleLocation, EndPoint);
+		AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponAttachSocketName);
+	}
+}
 
-		FTransform SpawnTransform;
-		SpawnTransform.SetLocation(MuzzleLocation);
-		SpawnTransform.SetRotation(LookRotation.Quaternion());
 
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = OwnerCharacter;
-		SpawnParams.Instigator = OwnerCharacter;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-		GetWorld()->SpawnActor<AShooterProjectile>(ProjectileClassToSpawn, SpawnTransform, SpawnParams);
+void AShooterWeapon::UnequipWeapon()
+{
+	if (OwnerCharacter)
+	{
+		AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HolsterAttachSocketName);
 	}
 }

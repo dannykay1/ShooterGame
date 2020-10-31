@@ -1,7 +1,7 @@
 // Copyright Danny Kay 2020.
 
 #include "Animation/ShooterAnimInstance.h"
-#include "Player/ShooterCharacter.h"
+#include "Pawns/ShooterCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ShooterGame/ShooterGame.h"
