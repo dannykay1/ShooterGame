@@ -22,6 +22,7 @@ public:
 	FORCEINLINE uint8 GetIsSprinting() const { return bIsSprinting; }
 	FORCEINLINE uint8 GetIsTargeting() const { return bIsTargeting; }
 	
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Shooter Character")
 	class AShooterWeapon* GetCurrentWeapon() const;
 
 	// Gets the animation movement type.  Used in animation blueprint.
@@ -34,7 +35,7 @@ public:
 	void StopFire();
 
 	UFUNCTION(BlueprintCallable, Category = "Shooter Character")
-	void Reload();
+	void StartReload();
 
 protected:
 	// Called when the game starts or when spawned
@@ -42,6 +43,8 @@ protected:
 
 	void StartSprint();
 	void StopSprint();
+
+	void Reload(class UAnimMontage* MontageToPlay, bool bInterrupted);
 
 	UFUNCTION()
 	void OnHealthChanged(class UShooterHealthComponent* OwningHealthComp, float Health, float HealthDelta, const UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);

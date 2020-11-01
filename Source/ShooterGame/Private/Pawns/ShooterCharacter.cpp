@@ -7,6 +7,7 @@
 #include "Weapons/ShooterWeapon.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/ShooterHealthComponent.h"
+#include "Animation/AnimInstance.h"
 
 
 // Sets default values
@@ -153,10 +154,26 @@ void AShooterCharacter::StopFire()
 }
 
 
-void AShooterCharacter::Reload()
+void AShooterCharacter::StartReload()
 {
-	if (GetCurrentWeapon())
+	UAnimMontage* ReloadMontage = GetCurrentWeapon() ? GetCurrentWeapon()->GetReloadMontage() : nullptr;
+	if (ReloadMontage)
 	{
-		//GetCurrentWeapon()->ReloadWeapon();
+		PlayAnimMontage(ReloadMontage);
+
+		FOnMontageEnded BlendOutDelegate;
+		BlendOutDelegate.BindUObject(this, &AShooterCharacter::Reload);
+
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_SetBlendingOutDelegate(BlendOutDelegate, ReloadMontage);
+	}
+}
+
+
+void AShooterCharacter::Reload(class UAnimMontage* MontageToPlay, bool bInterrupted)
+{
+	if (GetCurrentWeapon() && !bInterrupted)
+	{
+		GetCurrentWeapon()->ReloadWeapon();
 	}
 }

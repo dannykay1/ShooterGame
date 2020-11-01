@@ -82,7 +82,7 @@ void AShooterPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerI
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AShooterPlayerCharacter::StartFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AShooterPlayerCharacter::StopFire);
 
-	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AShooterPlayerCharacter::Reload);
+	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &AShooterPlayerCharacter::StartReload);
 
 	PlayerInputComponent->BindAction("Zoom", IE_Pressed, this, &AShooterPlayerCharacter::Zoom);
 	PlayerInputComponent->BindAction("Zoom", IE_Released, this, &AShooterPlayerCharacter::Zoom);

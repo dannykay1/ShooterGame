@@ -45,6 +45,12 @@ void AShooterWeapon::SetOwner(class AActor* NewOwner)
 	Super::SetOwner(NewOwner);
 
 	OwnerCharacter = Cast<AShooterCharacter>(NewOwner);
+
+	if (AmmoConfig.InitialClips > 0)
+	{
+		CurrentAmmoInClip = AmmoConfig.AmmoPerClip;
+		CurrentAmmo = AmmoConfig.AmmoPerClip * AmmoConfig.InitialClips;
+	}
 }
 
 
@@ -78,6 +84,13 @@ void AShooterWeapon::ProcessFire()
 		return;
 	}
 
+	if (!HasEnoughAmmo())
+	{
+		StopFire();
+		OwnerCharacter->StartReload();
+		return;
+	}
+
 	if (BurstCounter > 1 && BurstDelay > 0.f)
 	{
 		for (int32 i = 1; i <= BurstCounter; ++i)
@@ -89,6 +102,7 @@ void AShooterWeapon::ProcessFire()
 	else
 	{
 		SimulateWeaponFire();
+		UseAmmo();
 
 		for (int32 i = 1; i <= BurstCounter; ++i)
 		{
@@ -103,6 +117,7 @@ void AShooterWeapon::ProcessFire()
 void AShooterWeapon::HandleBurstFire()
 {
 	SimulateWeaponFire();
+	UseAmmo();
 	FireWeapon();
 }
 
@@ -197,4 +212,32 @@ void AShooterWeapon::UnequipWeapon()
 	{
 		AttachToComponent(OwnerCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HolsterAttachSocketName);
 	}
+}
+
+
+bool AShooterWeapon::HasEnoughAmmo()
+{
+	return CurrentAmmoInClip > 0;
+}
+
+
+void AShooterWeapon::UseAmmo()
+{
+	CurrentAmmoInClip = FMath::Clamp(CurrentAmmoInClip - 1, 0, AmmoConfig.AmmoPerClip);
+}
+
+
+void AShooterWeapon::GiveAmmo(int32 Value)
+{
+	CurrentAmmo = FMath::Clamp(CurrentAmmo + Value, 0, AmmoConfig.MaxAmmo);
+}
+
+
+void AShooterWeapon::ReloadWeapon()
+{
+	int32 ClipDelta = FMath::Min(AmmoConfig.AmmoPerClip - CurrentAmmoInClip, CurrentAmmo - CurrentAmmoInClip);
+
+	CurrentAmmoInClip = FMath::Clamp(CurrentAmmoInClip + ClipDelta, 0, AmmoConfig.AmmoPerClip);
+
+	CurrentAmmo = FMath::Clamp(CurrentAmmo - ClipDelta, 0, AmmoConfig.MaxAmmo);
 }

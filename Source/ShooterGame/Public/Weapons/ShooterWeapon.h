@@ -7,6 +7,28 @@
 #include "ShooterGame/ShooterGame.h"
 #include "ShooterWeapon.generated.h"
 
+USTRUCT()
+struct FAmmoData
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	int32 InitialClips;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	int32 MaxAmmo;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	int32 AmmoPerClip;
+
+	FAmmoData()
+	{
+		MaxAmmo = 100;
+		AmmoPerClip = 20;
+		InitialClips = 4;
+	}
+};
+
 UCLASS(Abstract, Blueprintable)
 class SHOOTERGAME_API AShooterWeapon : public AActor
 {
@@ -20,12 +42,16 @@ public:
 
 	FORCEINLINE EWeaponAnimationMovementType GetAnimationMovementType() const { return AnimationType; }
 	FORCEINLINE FName GetWeaponAttachSocketName() const { return WeaponAttachSocketName; }
+	FORCEINLINE class UAnimMontage* GetReloadMontage() const { return ReloadMontage; }
 
 	void StartFire();
 	void StopFire();
 
 	void EquipWeapon();
 	void UnequipWeapon();
+
+	void GiveAmmo(int32 Value);
+	void ReloadWeapon();
 
 protected:
 	// Called when the game starts or when spawned
@@ -39,6 +65,10 @@ protected:
 	void SimulateWeaponFire();
 
 	struct FHitResult WeaponTrace();
+
+	bool HasEnoughAmmo();
+	void UseAmmo();
+
 
 	class AShooterCharacter* OwnerCharacter;
 
@@ -105,4 +135,15 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	uint8 bAutomaticFire : 1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	FAmmoData AmmoConfig;
+
+	// Current total ammo. 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ammo")
+	int32 CurrentAmmo;
+
+	// Current ammo - inside clip.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ammo")
+	int32 CurrentAmmoInClip;
 };
