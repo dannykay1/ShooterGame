@@ -156,15 +156,16 @@ void AShooterCharacter::StopFire()
 
 void AShooterCharacter::StartReload()
 {
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
 	UAnimMontage* ReloadMontage = GetCurrentWeapon() ? GetCurrentWeapon()->GetReloadMontage() : nullptr;
-	if (ReloadMontage)
+	if (ReloadMontage && AnimInstance && !AnimInstance->Montage_IsPlaying(ReloadMontage))
 	{
 		PlayAnimMontage(ReloadMontage);
 
 		FOnMontageEnded BlendOutDelegate;
 		BlendOutDelegate.BindUObject(this, &AShooterCharacter::Reload);
 
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		AnimInstance->Montage_SetBlendingOutDelegate(BlendOutDelegate, ReloadMontage);
 	}
 }
