@@ -13,7 +13,7 @@
 // Sets default values
 AShooterProjectile::AShooterProjectile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
@@ -22,7 +22,7 @@ AShooterProjectile::AShooterProjectile()
 
 	ParticleComp = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleComp"));
 	ParticleComp->SetupAttachment(SphereComp);
-	
+
 	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComp"));
 	ProjectileMovementComp->InitialSpeed = 8000.f;
 	ProjectileMovementComp->MaxSpeed = 8000.f;
@@ -35,7 +35,7 @@ AShooterProjectile::AShooterProjectile()
 // Called when the game starts or when spawned
 void AShooterProjectile::BeginPlay()
 {
-	Super::BeginPlay();	
+	Super::BeginPlay();
 
 	SetLifeSpan(20.0f);
 
@@ -57,4 +57,19 @@ void AShooterProjectile::PlayImpactEffects(const FRotator ImpactRotation)
 	{
 		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), ImpactSound, GetActorLocation());
 	}
+}
+
+
+void AShooterProjectile::InitVelocity(FVector& ShotDirection, float NewSpeed)
+{
+	if (ProjectileMovementComp)
+	{
+		ProjectileMovementComp->InitialSpeed = ProjectileMovementComp->MaxSpeed = NewSpeed;
+	}
+}
+
+
+void AShooterProjectile::SetDamage(float NewDamage)
+{
+	Damage = NewDamage;
 }

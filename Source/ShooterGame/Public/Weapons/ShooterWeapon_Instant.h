@@ -25,10 +25,7 @@ protected:
 	void SpawnTrailEffect(const FVector& EndPoint);
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
-	FName TrailTargetParam;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
-	float BaseDamage;
+	FName TrailTargetParamName;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
 	class UParticleSystem* TrailEffect;

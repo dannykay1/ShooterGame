@@ -15,6 +15,9 @@ public:
 	// Sets default values for this actor's properties
 	AShooterProjectile();
 
+	void InitVelocity(FVector& ShotDirection, float NewSpeed);
+	void SetDamage(float NewDamage);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -31,7 +34,10 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Projectile")
 	void PlayImpactEffects(const FRotator ImpactRotation);
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile", meta = (ExposeOnSpawn = true))
+	float Speed;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile", meta = (ExposeOnSpawn = true))
 	float Damage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")

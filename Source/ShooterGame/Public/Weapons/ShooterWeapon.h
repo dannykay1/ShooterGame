@@ -105,8 +105,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	TSubclassOf<class UCameraShake> FireCamShake;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
-	TSubclassOf<class AShooterProjectile> ProjectileClassToSpawn;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	float BaseDamage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	int32 BurstCounter;

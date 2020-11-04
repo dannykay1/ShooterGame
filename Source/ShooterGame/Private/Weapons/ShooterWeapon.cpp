@@ -29,6 +29,8 @@ AShooterWeapon::AShooterWeapon()
 
 	AnimationType = EWeaponAnimationMovementType::Pistol;
 
+	BaseDamage = 20.f;
+
 	BurstCounter = 1;
 	BurstDelay = 0.f;
 
@@ -93,10 +95,11 @@ void AShooterWeapon::ProcessFire()
 
 	if (BurstCounter > 1 && BurstDelay > 0.f)
 	{
-		for (int32 i = 1; i <= BurstCounter; ++i)
+		for (int32 i = 0; i < BurstCounter; i++)
 		{
 			FTimerHandle TimerHande_Burst;
-			GetWorldTimerManager().SetTimer(TimerHande_Burst, this, &AShooterWeapon::HandleBurstFire, BurstDelay * i);
+			float Delay = i == 0 ? 0.05f : BurstDelay * i;
+			GetWorldTimerManager().SetTimer(TimerHande_Burst, this, &AShooterWeapon::HandleBurstFire, Delay);
 		}
 	}
 	else

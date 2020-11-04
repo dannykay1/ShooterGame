@@ -9,15 +9,12 @@
 
 AShooterWeapon_Instant::AShooterWeapon_Instant()
 {
-	TrailTargetParam = "TraceEnd";
-	BaseDamage = 20.f;
+	TrailTargetParamName = "TraceEnd";
 }
 
 
 void AShooterWeapon_Instant::FireWeapon()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Firing instant weapon"));
-
 	FHitResult Hit = WeaponTrace();
 
 	FVector EndPoint = Hit.TraceEnd;
@@ -58,7 +55,7 @@ void AShooterWeapon_Instant::SpawnTrailEffect(const FVector& EndPoint)
 		UParticleSystemComponent* TrailPSC = UGameplayStatics::SpawnEmitterAtLocation(this, TrailEffect, Origin);
 		if (TrailPSC)
 		{
-			TrailPSC->SetVectorParameter(TrailTargetParam, EndPoint);
+			TrailPSC->SetVectorParameter(TrailTargetParamName, EndPoint);
 		}
 	}
 }
