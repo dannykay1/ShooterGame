@@ -8,6 +8,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/ShooterHealthComponent.h"
 #include "Animation/AnimInstance.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 
 // Sets default values
@@ -85,11 +87,28 @@ void AShooterCharacter::Kill()
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
 	GetMesh()->SetSimulatePhysics(true);
 
+	FTimerHandle TimerHandle_SpawnEffects;
+	GetWorldTimerManager().SetTimer(TimerHandle_SpawnEffects, this, &AShooterCharacter::PlayDeathEffect, 1.0f);
+
 	SetLifeSpan(10.f);
 }
 
 
-class AShooterWeapon* AShooterCharacter::GetCurrentWeapon() const
+void AShooterCharacter::PlayDeathEffect()
+{
+	if (DeathEffect && GetMesh())
+	{
+		GetMesh()->SetHiddenInGame(true);
+
+		FVector SpawnLocation = GetMesh()->GetComponentLocation();
+		FRotator SpawnRotation = GetMesh()->GetComponentRotation();
+
+		UNiagaraFunctionLibrary::SpawnSystemAttached(DeathEffect, GetMesh(), NAME_None, SpawnLocation, SpawnRotation, EAttachLocation::SnapToTargetIncludingScale, true);
+	}
+}
+
+
+AShooterWeapon* AShooterCharacter::GetCurrentWeapon() const
 {
 	if (EquippedWeapons.Num() && EquippedWeapons.IsValidIndex(CurrentWeaponIndex))
 	{

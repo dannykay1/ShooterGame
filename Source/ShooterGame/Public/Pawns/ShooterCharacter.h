@@ -49,6 +49,8 @@ protected:
 	UFUNCTION()
 	void OnHealthChanged(class UShooterHealthComponent* OwningHealthComp, float Health, float HealthDelta, const UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
+	void PlayDeathEffect();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UShooterHealthComponent* HealthComp;
 
@@ -67,6 +69,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Movement")
 	float WalkSpeed;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Effects")
+	class UNiagaraSystem* DeathEffect;
 
 	uint8 bIsSprinting : 1;
 	uint8 bIsTargeting : 1;
