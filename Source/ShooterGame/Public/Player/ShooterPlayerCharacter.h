@@ -48,5 +48,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UCameraComponent* CameraComp;
 
-	uint8 bIsViewingRightShoulder : 1;
+	uint8 bIsViewingRightShoulder : 1; 
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
+	float CameraShoulderOffset;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
+	float SpringArmDistanceDefault;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Camera")
+	float SpringArmDistanceTargeting;
 };

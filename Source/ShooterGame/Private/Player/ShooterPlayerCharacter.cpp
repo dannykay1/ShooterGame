@@ -28,6 +28,10 @@ AShooterPlayerCharacter::AShooterPlayerCharacter()
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 
 	bIsViewingRightShoulder = true;
+
+	CameraShoulderOffset = 45.f;
+	SpringArmDistanceDefault = 175.f;
+	SpringArmDistanceTargeting = 35.f;
 }
 
 
@@ -44,7 +48,7 @@ void AShooterPlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// Zoom
-	float TargetArmLength = bIsTargeting ? 35.f : 250.f;
+	float TargetArmLength = bIsTargeting ? SpringArmDistanceTargeting : SpringArmDistanceDefault;
 	float NewArmLength = FMath::FInterpTo(SpringArmComp->TargetArmLength, TargetArmLength, DeltaTime, 10.f);
 
 	SpringArmComp->TargetArmLength = NewArmLength;
@@ -53,11 +57,10 @@ void AShooterPlayerCharacter::Tick(float DeltaTime)
 	FVector SpringArmLocation = SpringArmComp->GetRelativeLocation();
 
 	FVector TargetSpringArmLocation = FVector(SpringArmLocation);
-	TargetSpringArmLocation.Y = bIsViewingRightShoulder ? 45.f : -25.f;
+	TargetSpringArmLocation.Y = bIsViewingRightShoulder ? CameraShoulderOffset : -CameraShoulderOffset;
 
 	FVector NewSpringArmLocation = FMath::VInterpTo(SpringArmLocation, TargetSpringArmLocation, DeltaTime, 30.f);
 	SpringArmComp->SetRelativeLocation(NewSpringArmLocation);
-
 }
 
 

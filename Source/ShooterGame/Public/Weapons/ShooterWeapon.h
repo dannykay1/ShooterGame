@@ -69,7 +69,6 @@ protected:
 	bool HasEnoughAmmo();
 	void UseAmmo();
 
-
 	class AShooterCharacter* OwnerCharacter;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
@@ -146,4 +145,7 @@ protected:
 	// Current ammo - inside clip.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ammo")
 	int32 CurrentAmmoInClip;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	class UTexture2D* WeaponIcon;
 };
