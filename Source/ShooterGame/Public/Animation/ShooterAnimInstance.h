@@ -7,9 +7,7 @@
 #include "ShooterGame/ShooterGame.h"
 #include "ShooterAnimInstance.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class SHOOTERGAME_API UShooterAnimInstance : public UAnimInstance
 {

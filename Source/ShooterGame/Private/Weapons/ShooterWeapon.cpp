@@ -188,15 +188,6 @@ void AShooterWeapon::SimulateWeaponFire()
 			OwnerCharacter->PlayAnimMontage(TargetMontage);
 		}
 	}
-
-	if (OwnerCharacter)
-	{
-		APlayerController* PC = Cast<APlayerController>(OwnerCharacter->GetController());
-		if (PC)
-		{
-			PC->ClientPlayCameraShake(FireCamShake);
-		}
-	}
 }
 
 
