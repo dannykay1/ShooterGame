@@ -6,8 +6,8 @@
 
 #define COLLISION_WEAPON			ECollisionChannel::ECC_GameTraceChannel1
 #define COLLISION_PROJECTILE		ECollisionChannel::ECC_GameTraceChannel2
-#define COLLISION_PICKUP			ECollisionChannel::ECC_GameTraceChannel4
-#define COLLISION_INTERACTABLE		ECollisionChannel::ECC_GameTraceChannel5
+#define COLLISION_PICKUP			ECollisionChannel::ECC_GameTraceChannel3
+#define COLLISION_INTERACTABLE		ECollisionChannel::ECC_GameTraceChannel4
 
 UENUM(BlueprintType)
 enum class EWeaponAnimationMovementType : uint8

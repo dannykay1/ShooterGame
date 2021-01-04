@@ -34,6 +34,7 @@ void UShooterHealthComponent::BeginPlay()
 void UShooterHealthComponent::Heal(float HealAmount)
 {
 	Health = FMath::Clamp(Health + HealAmount, 0.f, DefaultHealth);
+	OnHealthChanged.Broadcast(this, Health, HealAmount, NULL, NULL, NULL);
 }
 
 

@@ -10,6 +10,7 @@
 #include "Weapons/ShooterWeapon.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Animation/AnimMontage.h"
+#include "ShooterGame/ShooterGame.h"
 
 
 AShooterPlayerCharacter::AShooterPlayerCharacter()
@@ -22,6 +23,8 @@ AShooterPlayerCharacter::AShooterPlayerCharacter()
 
 	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
 	CameraComp->SetupAttachment(SpringArmComp);
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(COLLISION_PICKUP, ECR_Overlap);
 
 	bUseControllerRotationYaw = true;
 
